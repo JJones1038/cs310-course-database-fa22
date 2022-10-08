@@ -10,6 +10,9 @@ public class Main {
         
         if (db.isConnected())
             System.err.println("Connected Successfully!");
+        
     }
+    
+
     
 }

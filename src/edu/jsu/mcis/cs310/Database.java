@@ -9,11 +9,6 @@ public class Database {
     private final Connection connection;
     
     private final int TERMID_SP22 = 1;
-    ResultSet resultset = null;
-    ResultSetMetaData metadata;
-    int columnCount;
-    PreparedStatement pstSelect = null, pstUpdate = null;
-    boolean hasresults;
     
     /* CONSTRUCTOR */
 
@@ -30,19 +25,18 @@ public class Database {
         String result = null;
         
         // INSERT YOUR CODE HERE
+        String query = "SELECT * FROM section WHERE termid = ? AND subjectid = ? AND num = ?";
         try{
-            String query = "SELECT * FROM section WHERE subjectid = '" + subjectid + "' AND num = " + num + " and termid = " + termid;
-            pstSelect = connection.prepareStatement(query);
-            hasresults = pstSelect.execute();
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setInt(1, termid);
+            ps.setString(2, subjectid);
+            ps.setString(3, num);
             
-            if (hasresults) {
-                resultset = pstSelect.getResultSet();
-                result = getResultSetAsJSON(resultset);
-            }
-            else {
-                result = "No Data Found";
-            }
+            ResultSet rs = ps.executeQuery();
             
+            result = getResultSetAsJSON(rs);
+            
+            rs.close();
             
         }
         catch (Exception e) { e.printStackTrace(); }
@@ -56,6 +50,18 @@ public class Database {
         int result = 0;
         
         // INSERT YOUR CODE HERE
+        String query = "INSERT INTO registration (studentid, termid, crn) VALUES (?, ?, ?)";
+        
+        try{
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setInt(1, studentid);
+            ps.setInt(2, termid);
+            ps.setInt(3, crn);
+            
+            result = ps.executeUpdate();
+        }
+        
+        catch (Exception e) { e.printStackTrace();}
                 
         return result;
         
@@ -66,6 +72,18 @@ public class Database {
         int result = 0;
         
         // INSERT YOUR CODE HERE
+        String query = "DELETE FROM registration WHERE studentid = ? AND termid = ? AND crn = ?";
+        
+        try{
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setInt(1, studentid);
+            ps.setInt(2, termid);
+            ps.setInt(3, crn);
+            
+            result = ps.executeUpdate();
+        }
+        
+        catch (Exception e) { e.printStackTrace();}
                 
         return result;
         
@@ -76,6 +94,16 @@ public class Database {
         int result = 0;
         
         // INSERT YOUR CODE HERE
+        String query = "DELETE FROM registration WHERE studentid = ? AND termid = ?";
+        
+        try{
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setInt(1, studentid);
+            ps.setInt(2, termid);
+            
+            result = ps.executeUpdate();
+        }
+        catch (Exception e) { e.printStackTrace();}
         
         return result;
         
@@ -86,6 +114,24 @@ public class Database {
         String result = null;
         
         // INSERT YOUR CODE HERE
+        String query = "SELECT * FROM registration r JOIN section s on s.crn = r.crn"
+                + "     WHERE r.studentid = ? AND r.termid = ?";
+        
+        try{
+            PreparedStatement ps = connection.prepareStatement(query);
+            ps.setInt(1,studentid);
+            ps.setInt(2, termid);
+            
+            ResultSet rs = ps.executeQuery();
+            
+            result = getResultSetAsJSON(rs);
+            
+            rs.close();
+        }
+        catch (Exception e) { e.printStackTrace();}
+        
+        
+        
         
         return result;
         
